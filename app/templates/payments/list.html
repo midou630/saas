@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Paiements{% endblock %}
+{% block page_title %}Suivi des paiements{% endblock %}
+{% block content %}
+
+<div class="card-header-row">
+    <form method="GET" class="flex gap-8">
+        <select name="status" class="form-control" onchange="this.form.submit()">
+            <option value="" {% if not status_filter %}selected{% endif %}>Tous les statuts</option>
+            <option value="paye" {% if status_filter == 'paye' %}selected{% endif %}>Payé</option>
+            <option value="paiement_partiel" {% if status_filter == 'paiement_partiel' %}selected{% endif %}>Paiement partiel</option>
+            <option value="non_paye" {% if status_filter == 'non_paye' %}selected{% endif %}>Non payé</option>
+        </select>
+    </form>
+</div>
+
+<div class="card">
+    {% if consultations %}
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead><tr><th>Date</th><th>Patient</th><th>Prix</th><th>Payé</th><th>Solde</th><th>Statut</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for consultation in consultations %}
+                <tr>
+                    <td>{{ consultation.visit_date.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ consultation.patient.full_name }}</td>
+                    <td>{{ "%.2f"|format(consultation.consultation_price) }} DA</td>
+                    <td>{{ "%.2f"|format(consultation.amount_paid) }} DA</td>
+                    <td class="text-danger">{{ "%.2f"|format(consultation.balance_due) }} DA</td>
+                    <td>
+                        {% if consultation.payment_status.value == 'paye' %}<span class="badge badge-success">Payé</span>
+                        {% elif consultation.payment_status.value == 'paiement_partiel' %}<span class="badge badge-warning">Partiel</span>
+                        {% else %}<span class="badge badge-danger">Non payé</span>{% endif %}
+                    </td>
+                    <td><a href="{{ url_for('consultations.view_consultation', consultation_id=consultation.id) }}" class="btn btn-secondary btn-sm">Détails</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination">
+        {% if pagination.has_prev %}<a href="{{ url_for('payments.list_payments', page=pagination.prev_num, status=status_filter) }}">&laquo; Précédent</a>{% endif %}
+        <span class="active">{{ pagination.page }} / {{ pagination.pages or 1 }}</span>
+        {% if pagination.has_next %}<a href="{{ url_for('payments.list_payments', page=pagination.next_num, status=status_filter) }}">Suivant &raquo;</a>{% endif %}
+    </div>
+    {% else %}
+    <div class="empty-state"><p>Aucun paiement à afficher.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

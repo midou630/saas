@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page { size: A4; margin: 2.2cm; }
+    body { font-family: "Helvetica", "Arial", sans-serif; color: #1f2937; font-size: 13px; }
+    .header { display: flex; justify-content: space-between; border-bottom: 3px solid #2563eb; padding-bottom: 14px; margin-bottom: 24px; }
+    .clinic-name { font-size: 20px; font-weight: 800; color: #1d4ed8; }
+    .patient-box { background: #f8fafc; border: 1px solid #e5e9f0; border-radius: 8px; padding: 14px 18px; margin-bottom: 24px; line-height: 1.8; }
+    .content-box { border: 1px solid #e5e9f0; border-radius: 8px; padding: 16px 18px; margin-bottom: 20px; }
+    .signature { margin-top: 60px; }
+    .signature .line { border-top: 1px solid #1f2937; width: 220px; margin-top: 50px; padding-top: 6px; font-size: 11px; color: #6b7280; }
+</style>
+</head>
+<body>
+    <div class="header">
+        <div class="clinic-name">{{ clinic_name }}</div>
+        <div style="text-align:right;">
+            <h2 style="margin:0;">DEMANDE DE RADIOLOGIE</h2>
+            <div style="color:#6b7280;">Date : {{ radiology_request.created_at.strftime('%d/%m/%Y') }}</div>
+        </div>
+    </div>
+    <div class="patient-box">
+        <strong>Patient :</strong> {{ radiology_request.consultation.patient.full_name }}<br>
+        <strong>N° Dossier :</strong> {{ radiology_request.consultation.patient.file_number }}<br>
+        <strong>Médecin demandeur :</strong> {{ radiology_request.requested_by.full_name if radiology_request.requested_by else '—' }}
+    </div>
+    <div class="content-box">
+        <strong>Examen demandé :</strong>
+        <p>{{ radiology_request.exam_type }} {% if radiology_request.body_area %}— {{ radiology_request.body_area }}{% endif %}</p>
+    </div>
+    {% if radiology_request.clinical_notes %}
+    <div class="content-box">
+        <strong>Renseignements cliniques :</strong>
+        <p>{{ radiology_request.clinical_notes }}</p>
+    </div>
+    {% endif %}
+    <div class="signature">
+        <div class="line">Signature et cachet du médecin</div>
+    </div>
+</body>
+</html>

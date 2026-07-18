@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Dossier de {{ patient.full_name }}{% endblock %}
+{% block page_title %}Dossier médical — {{ patient.full_name }}{% endblock %}
+{% block content %}
+
+<div class="card-header-row">
+    <div>
+        <h2 class="mb-0">{{ patient.full_name }} <span class="badge badge-info">{{ patient.file_number }}</span></h2>
+        <p class="text-muted" style="margin-top:6px;">{{ patient.gender_label }} · {{ patient.age if patient.age is not none else 'Âge inconnu' }} ans · {{ patient.phone or 'Pas de téléphone' }}</p>
+    </div>
+    <div class="flex gap-8">
+        <a href="{{ url_for('patients.edit_patient', patient_id=patient.id) }}" class="btn btn-secondary">Modifier</a>
+        <a href="{{ url_for('consultations.create_consultation', patient_id=patient.id) }}" class="btn btn-primary">+ Nouvelle visite</a>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h3>Informations générales</h3>
+        <p><strong>Adresse :</strong> {{ patient.address or '—' }}, {{ patient.city or '' }}</p>
+        <p><strong>E-mail :</strong> {{ patient.email or '—' }}</p>
+        <p><strong>Contact d'urgence :</strong> {{ patient.emergency_contact_name or '—' }} ({{ patient.emergency_contact_phone or '—' }})</p>
+        <p><strong>Groupe sanguin :</strong> {{ patient.blood_type or '—' }}</p>
+    </div>
+    <div class="card">
+        <h3>Antécédents médicaux</h3>
+        <p><strong>Allergies :</strong> {{ patient.allergies or 'Aucune connue' }}</p>
+        <p><strong>Maladies chroniques :</strong> {{ patient.chronic_diseases or 'Aucune' }}</p>
+        <p><strong>Opérations antérieures :</strong> {{ patient.past_surgeries or 'Aucune' }}</p>
+    </div>
+</div>
+
+<div class="card mt-16">
+    <h3>Historique des visites</h3>
+    {% if consultations %}
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead><tr><th>Date</th><th>Motif</th><th>Statut</th><th>Prix</th><th>Paiement</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for consultation in consultations %}
+                <tr>
+                    <td>{{ consultation.visit_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>{{ consultation.reason or '—' }}</td>
+                    <td><span class="badge badge-neutral">{{ consultation.status_label }}</span></td>
+                    <td>{{ "%.2f"|format(consultation.consultation_price) }} DA</td>
+                    <td>
+                        {% if consultation.payment_status.value == 'paye' %}<span class="badge badge-success">Payé</span>
+                        {% elif consultation.payment_status.value == 'paiement_partiel' %}<span class="badge badge-warning">Partiel</span>
+                        {% else %}<span class="badge badge-danger">Non payé</span>{% endif %}
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <a href="{{ url_for('consultations.view_consultation', consultation_id=consultation.id) }}" class="btn btn-secondary btn-sm">Détails</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><p>Aucune visite enregistrée pour ce patient.</p></div>
+    {% endif %}
+</div>
+
+<div class="card mt-16">
+    <h3>Documents et images</h3>
+    <div class="table-wrapper" style="margin-bottom:16px;">
+        <table class="data-table">
+            <thead><tr><th>Nom du fichier</th><th>Description</th><th>Ajouté le</th><th>Action</th></tr></thead>
+            <tbody>
+            {% for document in patient.documents %}
+                <tr>
+                    <td>{{ document.original_filename }}</td>
+                    <td>{{ document.description or '—' }}</td>
+                    <td class="text-muted">{{ document.created_at.strftime('%d/%m/%Y') }}</td>
+                    <td><a href="{{ url_for('patients.download_document', document_id=document.id) }}" class="btn btn-secondary btn-sm">Télécharger</a></td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4" class="text-muted">Aucun document téléversé.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <form method="POST" action="{{ url_for('patients.upload_document', patient_id=patient.id) }}" enctype="multipart/form-data" class="flex gap-8" style="align-items:flex-end;">
+        {{ document_form.hidden_tag() }}
+        <div class="form-group mb-0" style="flex:1;">
+            <label class="form-label">Description</label>
+            {{ document_form.description(class="form-control") }}
+        </div>
+        <div class="form-group mb-0">
+            <label class="form-label">Fichier (PDF, JPG, PNG)</label>
+            <input type="file" name="file" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Téléverser</button>
+    </form>
+</div>
+{% endblock %}

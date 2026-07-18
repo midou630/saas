@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{% if is_edit %}Modifier le produit{% else %}Nouveau produit{% endif %}{% endblock %}
+{% block page_title %}{% if is_edit %}Modifier le produit{% else %}Nouveau produit{% endif %}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:760px;">
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">{{ form.name.label.text }}</label>
+                {{ form.name(class="form-control") }}
+                {% for error in form.name.errors %}<div class="form-error">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.sku.label.text }}</label>
+                {{ form.sku(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.category_id.label.text }}</label>
+                {{ form.category_id(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.supplier_id.label.text }}</label>
+                {{ form.supplier_id(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.unit.label.text }}</label>
+                {{ form.unit(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.quantity_in_stock.label.text }}</label>
+                {{ form.quantity_in_stock(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.minimum_stock_threshold.label.text }}</label>
+                {{ form.minimum_stock_threshold(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.unit_purchase_price.label.text }}</label>
+                {{ form.unit_purchase_price(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.unit_sale_price.label.text }}</label>
+                {{ form.unit_sale_price(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.expiration_date.label.text }}</label>
+                {{ form.expiration_date(class="form-control", type="date") }}
+            </div>
+        </div>
+        <div class="flex gap-12">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('inventory.list_products') }}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

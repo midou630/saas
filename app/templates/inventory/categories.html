@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Catégories de produits{% endblock %}
+{% block page_title %}Catégories de produits{% endblock %}
+{% block content %}
+<div class="grid-2">
+    <div class="card">
+        <h3>Ajouter une catégorie</h3>
+        <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label class="form-label">{{ form.name.label.text }}</label>
+                {{ form.name(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.description.label.text }}</label>
+                {{ form.description(class="form-control") }}
+            </div>
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+    </div>
+    <div class="card">
+        <h3>Catégories existantes</h3>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Nom</th><th>Description</th></tr></thead>
+                <tbody>
+                {% for category in categories %}
+                    <tr><td>{{ category.name }}</td><td class="text-muted">{{ category.description or '—' }}</td></tr>
+                {% else %}
+                    <tr><td colspan="2" class="text-muted">Aucune catégorie créée.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

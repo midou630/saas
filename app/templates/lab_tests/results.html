@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Résultats d'analyses{% endblock %}
+{% block page_title %}Résultats d'analyses — {{ lab_request.consultation.patient.full_name }}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:700px;">
+    <p><strong>Analyses demandées :</strong> {{ lab_request.tests_requested }}</p>
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label class="form-label">{{ form.result_summary.label.text }}</label>
+            {{ form.result_summary(class="form-control", rows="5") }}
+        </div>
+        <div class="form-group">
+            <label class="form-label">{{ form.status.label.text }}</label>
+            {{ form.status(class="form-control") }}
+        </div>
+        <div class="flex gap-12">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('lab_tests.print_request', request_id=lab_request.id) }}" class="btn btn-secondary" target="_blank">Imprimer la demande</a>
+            <a href="{{ url_for('consultations.view_consultation', consultation_id=lab_request.consultation_id) }}" class="btn btn-secondary">Retour</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

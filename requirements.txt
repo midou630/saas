@@ -1,0 +1,56 @@
+# ============================================================
+# Clinic Management SaaS - Production Dependencies
+# ============================================================
+
+# ---- Core Framework ----
+Flask==3.0.3
+Werkzeug==3.0.4
+
+# ---- Database & ORM ----
+Flask-SQLAlchemy==3.1.1
+SQLAlchemy==2.0.35
+Flask-Migrate==4.0.7
+Alembic==1.13.3
+psycopg2-binary==2.9.9
+
+# ---- Authentication & Security ----
+Flask-Login==0.6.3
+Flask-WTF==1.2.1
+WTForms==3.1.2
+Flask-Talisman==1.1.0
+bcrypt==4.2.0
+email-validator==2.2.0
+
+# ---- Forms & Validation ----
+WTForms-SQLAlchemy==0.4.1
+
+# ---- Environment & Configuration ----
+python-dotenv==1.0.1
+
+# ---- PDF Generation (Prescriptions, Invoices, Reports) ----
+WeasyPrint==62.3
+reportlab==4.2.5
+
+# ---- Excel Export (Reports) ----
+openpyxl==3.1.5
+
+# ---- Image Processing (Patient documents/photos) ----
+Pillow==10.4.0
+
+# ---- Date & Time Utilities ----
+python-dateutil==2.9.0.post0
+
+# ---- Rate Limiting (Security) ----
+Flask-Limiter==3.8.0
+
+# ---- Caching (Performance) ----
+Flask-Caching==2.3.0
+
+# ---- Production WSGI Server ----
+gunicorn==23.0.0
+
+# ---- Timezone Support ----
+pytz==2024.2
+
+# ---- UUID & Unique Identifiers ----
+python-slugify==8.0.4

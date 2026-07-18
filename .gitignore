@@ -1,0 +1,33 @@
+# Environnements Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Variables d'environnement
+.env
+
+# Base de données locale
+instance/
+*.db
+*.sqlite
+*.sqlite3
+
+# Fichiers téléversés par les utilisateurs
+app/static/uploads/
+
+# Migrations générées (à committer normalement, décommentez si géré autrement)
+# migrations/
+
+# IDE
+.vscode/
+.idea/
+
+# Système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

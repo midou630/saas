@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Ordonnance #{{ prescription.id }}{% endblock %}
+{% block page_title %}Ordonnance #{{ prescription.id }}{% endblock %}
+{% block content %}
+
+<div class="card-header-row">
+    <h2 class="mb-0">{{ prescription.consultation.patient.full_name }}</h2>
+    <div class="actions-cell">
+        <a href="{{ url_for('prescriptions.print_prescription', prescription_id=prescription.id) }}" class="btn btn-primary" target="_blank">Imprimer PDF</a>
+        <a href="{{ url_for('prescriptions.edit_prescription', prescription_id=prescription.id) }}" class="btn btn-secondary">Modifier</a>
+        <form method="POST" action="{{ url_for('prescriptions.delete_prescription', prescription_id=prescription.id) }}" data-confirm="Supprimer cette ordonnance ?">
+            <button type="submit" class="btn btn-outline-danger">Supprimer</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead><tr><th>Médicament</th><th>Dosage</th><th>Fréquence</th><th>Durée</th><th>Instructions</th></tr></thead>
+            <tbody>
+            {% for item in prescription.items %}
+                <tr>
+                    <td>{{ item.medication_name }}</td>
+                    <td>{{ item.dosage or '—' }}</td>
+                    <td>{{ item.frequency or '—' }}</td>
+                    <td>{{ item.duration or '—' }}</td>
+                    <td>{{ item.instructions or '—' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if prescription.additional_instructions %}
+    <p class="mt-16"><strong>Instructions générales :</strong> {{ prescription.additional_instructions }}</p>
+    {% endif %}
+</div>
+{% endblock %}

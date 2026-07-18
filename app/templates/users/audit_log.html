@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Journal d'audit{% endblock %}
+{% block page_title %}Journal d'audit{% endblock %}
+{% block content %}
+<div class="card">
+    {% if logs %}
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead><tr><th>Date et heure</th><th>Utilisateur</th><th>Action</th><th>Entité</th><th>Description</th><th>Adresse IP</th></tr></thead>
+            <tbody>
+            {% for log in logs %}
+                <tr>
+                    <td class="text-muted">{{ log.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
+                    <td>{{ log.user.full_name if log.user else 'Système' }}</td>
+                    <td><span class="badge badge-neutral">{{ log.action }}</span></td>
+                    <td class="text-muted">{{ log.entity_type or '—' }} {{ log.entity_id or '' }}</td>
+                    <td>{{ log.description or '—' }}</td>
+                    <td class="text-muted">{{ log.ip_address or '—' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination">
+        {% if pagination.has_prev %}<a href="{{ url_for('users.audit_log', page=pagination.prev_num) }}">&laquo; Précédent</a>{% endif %}
+        <span class="active">{{ pagination.page }} / {{ pagination.pages or 1 }}</span>
+        {% if pagination.has_next %}<a href="{{ url_for('users.audit_log', page=pagination.next_num) }}">Suivant &raquo;</a>{% endif %}
+    </div>
+    {% else %}
+    <div class="empty-state"><p>Aucune entrée dans le journal d'audit.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

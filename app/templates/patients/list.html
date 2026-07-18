@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Patients{% endblock %}
+{% block page_title %}Gestion des patients{% endblock %}
+{% block content %}
+
+<div class="card-header-row">
+    <div class="search-bar mb-0">
+        <form method="GET" style="display:flex;gap:10px;">
+            <input type="text" name="q" class="form-control" placeholder="Rechercher par nom, prénom, n° dossier ou téléphone..." value="{{ search_query }}" data-live-search>
+            <button type="submit" class="btn btn-secondary">Rechercher</button>
+        </form>
+    </div>
+    <a href="{{ url_for('patients.create_patient') }}" class="btn btn-primary">+ Ajouter un patient</a>
+</div>
+
+<div class="card">
+    {% if patients %}
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>N° Dossier</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Âge</th>
+                    <th>Genre</th>
+                    <th>Dernière visite</th>
+                    <th>Statut paiement</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for patient in patients %}
+                {% set last_consultation = patient.consultations[0] if patient.consultations else None %}
+                <tr>
+                    <td><span class="badge badge-info">{{ patient.file_number }}</span></td>
+                    <td>{{ patient.last_name }}</td>
+                    <td>{{ patient.first_name }}</td>
+                    <td>{{ patient.age if patient.age is not none else '—' }}</td>
+                    <td>{{ patient.gender_label }}</td>
+                    <td class="text-muted">
+                        {% if last_consultation %}{{ last_consultation.visit_date.strftime('%d/%m/%Y') }}{% else %}—{% endif %}
+                    </td>
+                    <td>
+                        {% if last_consultation %}
+                            {% if last_consultation.payment_status.value == 'paye' %}
+                                <span class="badge badge-success">Payé</span>
+                            {% elif last_consultation.payment_status.value == 'paiement_partiel' %}
+                                <span class="badge badge-warning">Partiel</span>
+                            {% else %}
+                                <span class="badge badge-danger">Non payé</span>
+                            {% endif %}
+                        {% else %}<span class="badge badge-neutral">—</span>{% endif %}
+                    </td>
+                    <td>
+                        <div class="actions-cell">
+                            <a href="{{ url_for('patients.view_patient', patient_id=patient.id) }}" class="btn btn-secondary btn-sm">Dossier</a>
+                            <a href="{{ url_for('patients.edit_patient', patient_id=patient.id) }}" class="btn btn-secondary btn-sm">Modifier</a>
+                            <a href="{{ url_for('consultations.create_consultation', patient_id=patient.id) }}" class="btn btn-primary btn-sm">Nouvelle visite</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination">
+        {% if pagination.has_prev %}
+            <a href="{{ url_for('patients.list_patients', page=pagination.prev_num, q=search_query) }}">&laquo; Précédent</a>
+        {% endif %}
+        <span class="active">{{ pagination.page }} / {{ pagination.pages or 1 }}</span>
+        {% if pagination.has_next %}
+            <a href="{{ url_for('patients.list_patients', page=pagination.next_num, q=search_query) }}">Suivant &raquo;</a>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">🗂️</div>
+        <h3>Aucun patient trouvé</h3>
+        <p>Commencez par ajouter votre premier patient.</p>
+        <a href="{{ url_for('patients.create_patient') }}" class="btn btn-primary">+ Ajouter un patient</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

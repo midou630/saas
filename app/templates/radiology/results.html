@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Résultats de radiologie{% endblock %}
+{% block page_title %}Compte rendu — {{ radiology_request.consultation.patient.full_name }}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:700px;">
+    <p><strong>Examen demandé :</strong> {{ radiology_request.exam_type }} {% if radiology_request.body_area %}({{ radiology_request.body_area }}){% endif %}</p>
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            <label class="form-label">{{ form.result_summary.label.text }}</label>
+            {{ form.result_summary(class="form-control", rows="5") }}
+        </div>
+        <div class="form-group">
+            <label class="form-label">{{ form.status.label.text }}</label>
+            {{ form.status(class="form-control") }}
+        </div>
+        <div class="flex gap-12">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('radiology.print_request', request_id=radiology_request.id) }}" class="btn btn-secondary" target="_blank">Imprimer la demande</a>
+            <a href="{{ url_for('consultations.view_consultation', consultation_id=radiology_request.consultation_id) }}" class="btn btn-secondary">Retour</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

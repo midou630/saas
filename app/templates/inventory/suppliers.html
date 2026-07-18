@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Fournisseurs{% endblock %}
+{% block page_title %}Fournisseurs{% endblock %}
+{% block content %}
+<div class="grid-2">
+    <div class="card">
+        <h3>Ajouter un fournisseur</h3>
+        <form method="POST" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label class="form-label">{{ form.name.label.text }}</label>
+                {{ form.name(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.contact_name.label.text }}</label>
+                {{ form.contact_name(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.phone.label.text }}</label>
+                {{ form.phone(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.email.label.text }}</label>
+                {{ form.email(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.address.label.text }}</label>
+                {{ form.address(class="form-control") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form.notes.label.text }}</label>
+                {{ form.notes(class="form-control", rows="2") }}
+            </div>
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+    </div>
+    <div class="card">
+        <h3>Fournisseurs existants</h3>
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Nom</th><th>Contact</th><th>Téléphone</th></tr></thead>
+                <tbody>
+                {% for supplier in suppliers %}
+                    <tr><td>{{ supplier.name }}</td><td class="text-muted">{{ supplier.contact_name or '—' }}</td><td class="text-muted">{{ supplier.phone or '—' }}</td></tr>
+                {% else %}
+                    <tr><td colspan="3" class="text-muted">Aucun fournisseur créé.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

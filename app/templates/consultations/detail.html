@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Consultation — {{ consultation.patient.full_name }}{% endblock %}
+{% block page_title %}Consultation du {{ consultation.visit_date.strftime('%d/%m/%Y') }}{% endblock %}
+{% block content %}
+
+<div class="card-header-row">
+    <div>
+        <h2 class="mb-0">{{ consultation.patient.full_name }} <span class="badge badge-info">{{ consultation.patient.file_number }}</span></h2>
+        <p class="text-muted" style="margin-top:6px;">{{ consultation.visit_date.strftime('%d/%m/%Y %H:%M') }} · {{ consultation.status_label }}</p>
+    </div>
+    <div class="flex gap-8">
+        <a href="{{ url_for('consultations.edit_consultation', consultation_id=consultation.id) }}" class="btn btn-secondary">Modifier</a>
+        <form method="POST" action="{{ url_for('consultations.mark_no_show', consultation_id=consultation.id) }}" data-confirm="Confirmer que le patient ne s'est pas présenté ?">
+            <button type="submit" class="btn btn-outline-danger">Patient absent</button>
+        </form>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h3>Détails cliniques</h3>
+        <p><strong>Motif :</strong> {{ consultation.reason or '—' }}</p>
+        <p><strong>Diagnostic :</strong> {{ consultation.diagnosis or '—' }}</p>
+        <p><strong>Traitement :</strong> {{ consultation.treatment or '—' }}</p>
+        <p><strong>Notes :</strong> {{ consultation.notes or '—' }}</p>
+    </div>
+    <div class="card">
+        <h3>Paiement</h3>
+        <p><strong>Prix de la consultation :</strong> {{ "%.2f"|format(consultation.consultation_price) }} DA</p>
+        <p><strong>Montant payé :</strong> {{ "%.2f"|format(consultation.amount_paid) }} DA</p>
+        <p><strong>Solde restant :</strong> <span class="text-danger">{{ "%.2f"|format(consultation.balance_due) }} DA</span></p>
+        <p><strong>Statut :</strong>
+            {% if consultation.payment_status.value == 'paye' %}<span class="badge badge-success">Payé</span>
+            {% elif consultation.payment_status.value == 'paiement_partiel' %}<span class="badge badge-warning">Partiel</span>
+            {% else %}<span class="badge badge-danger">Non payé</span>{% endif %}
+        </p>
+        {% if consultation.balance_due > 0 %}
+        <form method="POST" action="{{ url_for('consultations.finalize_visit', consultation_id=consultation.id) }}" class="flex gap-8" style="align-items:flex-end;margin-top:14px;">
+            {{ payment_form.hidden_tag() }}
+            <div class="form-group mb-0" style="flex:1;">
+                <label class="form-label">Montant reçu</label>
+                {{ payment_form.amount(class="form-control") }}
+            </div>
+            <div class="form-group mb-0">
+                <label class="form-label">Méthode</label>
+                {{ payment_form.method(class="form-control") }}
+            </div>
+            <button type="submit" class="btn btn-success">Finaliser et payer</button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid-2 mt-16">
+    <div class="card">
+        <div class="card-header-row">
+            <h3 class="mb-0">Ordonnances</h3>
+            <a href="{{ url_for('prescriptions.create_prescription', consultation_id=consultation.id) }}" class="btn btn-primary btn-sm">+ Nouvelle ordonnance</a>
+        </div>
+        {% for prescription in consultation.prescriptions %}
+            <div class="flex justify-between items-center" style="padding:10px 0;border-bottom:1px solid var(--color-border);">
+                <span>Ordonnance #{{ prescription.id }} — {{ prescription.created_at.strftime('%d/%m/%Y') }}</span>
+                <div class="actions-cell">
+                    <a href="{{ url_for('prescriptions.view_prescription', prescription_id=prescription.id) }}" class="btn btn-secondary btn-sm">Voir</a>
+                    <a href="{{ url_for('prescriptions.print_prescription', prescription_id=prescription.id) }}" class="btn btn-secondary btn-sm" target="_blank">PDF</a>
+                </div>
+            </div>
+        {% else %}
+            <p class="text-muted">Aucune ordonnance créée.</p>
+        {% endfor %}
+    </div>
+
+    <div class="card">
+        <div class="card-header-row">
+            <h3 class="mb-0">Analyses & Radiologie</h3>
+            <div class="actions-cell">
+                <a href="{{ url_for('lab_tests.create_lab_request', consultation_id=consultation.id) }}" class="btn btn-secondary btn-sm">+ Analyses</a>
+                <a href="{{ url_for('radiology.create_radiology_request', consultation_id=consultation.id) }}" class="btn btn-secondary btn-sm">+ Radiologie</a>
+            </div>
+        </div>
+        {% for lab in consultation.lab_requests %}
+            <div class="flex justify-between items-center" style="padding:10px 0;border-bottom:1px solid var(--color-border);">
+                <span>Analyse #{{ lab.id }} — {{ lab.status_label }}</span>
+                <a href="{{ url_for('lab_tests.update_results', request_id=lab.id) }}" class="btn btn-secondary btn-sm">Gérer</a>
+            </div>
+        {% endfor %}
+        {% for radio in consultation.radiology_requests %}
+            <div class="flex justify-between items-center" style="padding:10px 0;border-bottom:1px solid var(--color-border);">
+                <span>{{ radio.exam_type }} — {{ radio.status_label }}</span>
+                <a href="{{ url_for('radiology.update_results', request_id=radio.id) }}" class="btn btn-secondary btn-sm">Gérer</a>
+            </div>
+        {% endfor %}
+        {% if not consultation.lab_requests and not consultation.radiology_requests %}
+            <p class="text-muted">Aucune demande créée.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

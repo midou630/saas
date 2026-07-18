@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Utilisateurs{% endblock %}
+{% block page_title %}Gestion des utilisateurs{% endblock %}
+{% block content %}
+
+<div class="card-header-row">
+    <h2 class="mb-0">{{ users|length }} utilisateur(s)</h2>
+    <a href="{{ url_for('users.create_user') }}" class="btn btn-primary">+ Ajouter un utilisateur</a>
+</div>
+
+<div class="card">
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead><tr><th>Nom complet</th><th>E-mail</th><th>Rôle</th><th>Statut</th><th>Dernière connexion</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td><span class="badge badge-info">{{ user.role_label }}</span></td>
+                    <td>
+                        {% if user.is_active_account %}<span class="badge badge-success">Actif</span>
+                        {% else %}<span class="badge badge-neutral">Désactivé</span>{% endif %}
+                    </td>
+                    <td class="text-muted">{{ user.last_login_at.strftime('%d/%m/%Y %H:%M') if user.last_login_at else 'Jamais' }}</td>
+                    <td>
+                        <div class="actions-cell">
+                            <a href="{{ url_for('users.edit_user', user_id=user.id) }}" class="btn btn-secondary btn-sm">Modifier</a>
+                            {% if user.id != current_user.id %}
+                            <form method="POST" action="{{ url_for('users.delete_user', user_id=user.id) }}" data-confirm="Archiver cet utilisateur ?">
+                                <button type="submit" class="btn btn-outline-danger btn-sm">Archiver</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

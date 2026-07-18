@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Stock{% endblock %}
+{% block page_title %}Gestion du stock{% endblock %}
+{% block content %}
+
+<div class="card-header-row">
+    <div class="search-bar mb-0">
+        <form method="GET" style="display:flex;gap:10px;">
+            <input type="text" name="q" class="form-control" placeholder="Rechercher un produit..." value="{{ search_query }}" data-live-search>
+            <button type="submit" class="btn btn-secondary">Rechercher</button>
+        </form>
+    </div>
+    <div class="actions-cell">
+        <a href="{{ url_for('inventory.manage_categories') }}" class="btn btn-secondary">Catégories</a>
+        <a href="{{ url_for('inventory.manage_suppliers') }}" class="btn btn-secondary">Fournisseurs</a>
+        <a href="{{ url_for('inventory.create_product') }}" class="btn btn-primary">+ Ajouter un produit</a>
+    </div>
+</div>
+
+<div class="card">
+    {% if products %}
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead><tr><th>Produit</th><th>Catégorie</th><th>Quantité</th><th>Seuil d'alerte</th><th>Prix de vente</th><th>Péremption</th><th>Actions</th></tr></thead>
+            <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td class="text-muted">{{ product.category.name if product.category else '—' }}</td>
+                    <td>
+                        {% if product.is_low_stock %}<span class="badge badge-danger">{{ product.quantity_in_stock }} {{ product.unit }}</span>
+                        {% else %}<span class="badge badge-success">{{ product.quantity_in_stock }} {{ product.unit }}</span>{% endif %}
+                    </td>
+                    <td class="text-muted">{{ product.minimum_stock_threshold }}</td>
+                    <td>{{ "%.2f"|format(product.unit_sale_price) if product.unit_sale_price else '—' }} DA</td>
+                    <td class="text-muted">{{ product.expiration_date.strftime('%d/%m/%Y') if product.expiration_date else '—' }}</td>
+                    <td>
+                        <div class="actions-cell">
+                            <a href="{{ url_for('inventory.add_movement', product_id=product.id) }}" class="btn btn-secondary btn-sm">Mouvement</a>
+                            <a href="{{ url_for('inventory.edit_product', product_id=product.id) }}" class="btn btn-secondary btn-sm">Modifier</a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="pagination">
+        {% if pagination.has_prev %}<a href="{{ url_for('inventory.list_products', page=pagination.prev_num, q=search_query) }}">&laquo; Précédent</a>{% endif %}
+        <span class="active">{{ pagination.page }} / {{ pagination.pages or 1 }}</span>
+        {% if pagination.has_next %}<a href="{{ url_for('inventory.list_products', page=pagination.next_num, q=search_query) }}">Suivant &raquo;</a>{% endif %}
+    </div>
+    {% else %}
+    <div class="empty-state"><p>Aucun produit en stock.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block content %}
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-icon blue">💰</div>
+        </div>
+        <div class="stat-value">{{ "%.2f"|format(revenue_today) }} DA</div>
+        <div class="stat-label">Revenus du jour</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-icon green">📅</div>
+        </div>
+        <div class="stat-value">{{ "%.2f"|format(revenue_month) }} DA</div>
+        <div class="stat-label">Revenus du mois</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-icon blue">🧑‍🤝‍🧑</div>
+        </div>
+        <div class="stat-value">{{ patients_count }}</div>
+        <div class="stat-label">Patients enregistrés</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-icon amber">🩺</div>
+        </div>
+        <div class="stat-value">{{ appointments_today }}</div>
+        <div class="stat-label">Visites aujourd'hui</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-card-top">
+            <div class="stat-icon red">⚠️</div>
+        </div>
+        <div class="stat-value">{{ unpaid_consultations }}</div>
+        <div class="stat-label">Consultations impayées</div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <div class="card-header-row">
+            <h3 class="mb-0">Revenus des 7 derniers jours</h3>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:10px;height:180px;">
+            {% set max_total = (daily_revenue|map(attribute='total')|max) or 1 %}
+            {% for day in daily_revenue %}
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <div style="width:100%;background:var(--color-primary-light);border-radius:6px 6px 0 0;height:{{ (day.total / (max_total if max_total > 0 else 1) * 140)|round|int }}px;min-height:4px;position:relative;">
+                    <div style="position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:0.68rem;color:var(--color-text-muted);white-space:nowrap;">{{ "%.0f"|format(day.total) }}</div>
+                </div>
+                <span style="font-size:0.72rem;color:var(--color-text-muted);">{{ day.label }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header-row">
+            <h3 class="mb-0">Produits en stock faible</h3>
+            <a href="{{ url_for('inventory.list_products', low_stock=1) }}" class="btn btn-secondary btn-sm">Voir tout</a>
+        </div>
+        {% if low_stock_products %}
+        <div class="table-wrapper">
+            <table class="data-table">
+                <thead><tr><th>Produit</th><th>Quantité</th><th>Seuil</th></tr></thead>
+                <tbody>
+                {% for product in low_stock_products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td><span class="badge badge-danger">{{ product.quantity_in_stock }} {{ product.unit }}</span></td>
+                        <td class="text-muted">{{ product.minimum_stock_threshold }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state"><p>Aucun produit en stock faible actuellement.</p></div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mt-16">
+    <div class="card-header-row">
+        <h3 class="mb-0">Derniers patients enregistrés</h3>
+        <a href="{{ url_for('patients.list_patients') }}" class="btn btn-secondary btn-sm">Voir tous les patients</a>
+    </div>
+    {% if recent_patients %}
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead><tr><th>N° Dossier</th><th>Nom complet</th><th>Téléphone</th><th>Date d'ajout</th></tr></thead>
+            <tbody>
+            {% for patient in recent_patients %}
+                <tr onclick="window.location='{{ url_for('patients.view_patient', patient_id=patient.id) }}'" style="cursor:pointer;">
+                    <td><span class="badge badge-info">{{ patient.file_number }}</span></td>
+                    <td>{{ patient.full_name }}</td>
+                    <td>{{ patient.phone or '—' }}</td>
+                    <td class="text-muted">{{ patient.created_at.strftime('%d/%m/%Y') }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state"><p>Aucun patient enregistré pour le moment.</p></div>
+    {% endif %}
+</div>
+{% endblock %}

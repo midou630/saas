@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Ordonnance — {{ consultation.patient.full_name }}{% endblock %}
+{% block page_title %}{% if is_edit %}Modifier l'ordonnance{% else %}Nouvelle ordonnance{% endif %} — {{ consultation.patient.full_name }}{% endblock %}
+{% block content %}
+
+<div class="card" style="max-width:960px;">
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+
+        <h3>Médicaments</h3>
+        <div id="prescription-items-container">
+            {% for item_form in form.items %}
+            <div class="prescription-item-row">
+                <div class="form-group mb-0">
+                    <label class="form-label">Médicament</label>
+                    {{ item_form.medication_name(class="form-control") }}
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Dosage</label>
+                    {{ item_form.dosage(class="form-control") }}
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Fréquence</label>
+                    {{ item_form.frequency(class="form-control") }}
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Durée</label>
+                    {{ item_form.duration(class="form-control") }}
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Instructions</label>
+                    {{ item_form.instructions(class="form-control") }}
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-icon" onclick="removePrescriptionItemRow(this)">&times;</button>
+            </div>
+            {% endfor %}
+        </div>
+
+        <template id="prescription-item-template">
+            <div class="prescription-item-row">
+                <div class="form-group mb-0">
+                    <label class="form-label">Médicament</label>
+                    <input type="text" class="form-control" name="items-__INDEX__-medication_name" id="items-__INDEX__-medication_name">
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Dosage</label>
+                    <input type="text" class="form-control" name="items-__INDEX__-dosage" id="items-__INDEX__-dosage">
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Fréquence</label>
+                    <input type="text" class="form-control" name="items-__INDEX__-frequency" id="items-__INDEX__-frequency">
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Durée</label>
+                    <input type="text" class="form-control" name="items-__INDEX__-duration" id="items-__INDEX__-duration">
+                </div>
+                <div class="form-group mb-0">
+                    <label class="form-label">Instructions</label>
+                    <input type="text" class="form-control" name="items-__INDEX__-instructions" id="items-__INDEX__-instructions">
+                </div>
+                <button type="button" class="btn btn-outline-danger btn-icon" onclick="removePrescriptionItemRow(this)">&times;</button>
+            </div>
+        </template>
+
+        <button type="button" class="btn btn-secondary btn-sm" onclick="addPrescriptionItemRow()" style="margin-bottom:20px;">+ Ajouter un médicament</button>
+
+        <div class="form-group">
+            <label class="form-label">{{ form.additional_instructions.label.text }}</label>
+            {{ form.additional_instructions(class="form-control", rows="3") }}
+        </div>
+
+        <div class="flex gap-12">
+            {{ form.submit(class="btn btn-primary") }}
+            <a href="{{ url_for('consultations.view_consultation', consultation_id=consultation.id) }}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

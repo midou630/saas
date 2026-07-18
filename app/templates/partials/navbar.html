@@ -1,0 +1,23 @@
+<header class="topbar">
+    <div class="flex items-center gap-12">
+        <button class="mobile-menu-toggle" aria-label="Ouvrir le menu">☰</button>
+        <div class="topbar-title">{% block page_title %}{% endblock %}</div>
+    </div>
+    <div class="topbar-actions">
+        <div class="notification-bell" title="Notifications">
+            <span style="font-size:1.2rem;">🔔</span>
+            {% if unread_notifications_count > 0 %}
+                <span class="notification-badge">{{ unread_notifications_count }}</span>
+            {% endif %}
+        </div>
+        <div class="user-chip">
+            <div class="user-avatar">{{ current_user.first_name[0] }}{{ current_user.last_name[0] }}</div>
+            <div>
+                <div style="font-size:0.85rem;font-weight:700;">{{ current_user.full_name }}</div>
+                <div style="font-size:0.72rem;color:var(--color-text-muted);">{{ current_user.role_label }}</div>
+            </div>
+        </div>
+        <a href="{{ url_for('auth.change_password') }}" class="btn btn-secondary btn-sm">Mot de passe</a>
+        <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm">Déconnexion</a>
+    </div>
+</header>
